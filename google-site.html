@@ -1,0 +1,1981 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>BMC Bell Schedule</title><style>body{margin:0}</style></head><body>
+<!-- Paste this entire fragment into your website HTML block. -->
+<style>
+#bmc-bell-schedule {
+  --bmc-v3-black:#242122; --bmc-v3-gray-900:#333132; --bmc-v3-gray-700:#5f5b5c;
+  --bmc-v3-gray-300:#d5d2d2; --bmc-v3-gray-100:#f5f3f1; --bmc-v3-white:#fff;
+  --bmc-v3-gold:#ddb75f; --bmc-v3-gold-dark:#a9822f;
+  position:relative; isolation:isolate; width:100%; min-width:0;
+  color:var(--bmc-v3-black); background:#fff;
+  font-family:"futura-pt","Futura PT","Avenir Next",Avenir,Montserrat,Arial,sans-serif;
+  line-height:1.55; text-rendering:optimizeLegibility;
+}
+#bmc-bell-schedule, #bmc-bell-schedule *,
+#bmc-bell-schedule *::before, #bmc-bell-schedule *::after { box-sizing:border-box; }
+#bmc-bell-schedule .schedule-app { width:100%; background:#fff; }
+#bmc-bell-schedule h1, #bmc-bell-schedule h2 { font-family:inherit; }
+#bmc-bell-schedule .bmc-section-dark { background:var(--bmc-v3-black); color:#fff; }
+#bmc-bell-schedule .bmc-eyebrow { font-size:.78rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+#bmc-bell-schedule .bmc-btn { display:inline-block; margin:0; border:2px solid; border-radius:0; background:transparent; color:var(--bmc-v3-black); font-family:inherit; font-weight:800; line-height:1.3; text-align:center; cursor:pointer; }
+#bmc-bell-schedule .bmc-btn:hover { background:var(--bmc-v3-gold); }
+#bmc-bell-schedule .bmc-btn:focus-visible { outline:3px solid var(--bmc-v3-gold-dark); outline-offset:2px; }
+/* Keyboard skip link. */
+
+#bmc-bell-schedule .skip-link {
+  position: absolute;
+  top: .75rem;
+  left: .75rem;
+  z-index: 100;
+  padding: .7rem 1rem;
+  background: var(--bmc-v3-gold);
+  color: var(--bmc-v3-black);
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#bmc-bell-schedule .skip-link:focus {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Centered live clock. */
+#bmc-bell-schedule .utility-header {
+  display:flex;
+  min-height:72px;
+  align-items:center;
+  justify-content:center;
+  padding:.8rem 1rem;
+  border-bottom:5px solid var(--bmc-v3-gold);
+}
+#bmc-bell-schedule .utility-clock {
+  width:100%;
+  color:var(--bmc-v3-white);
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+#bmc-bell-schedule .utility-time {
+  display:block;
+  color:var(--bmc-v3-white);
+  font-size:clamp(1.5rem,3vw,2.5rem);
+  font-weight:650;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+/* Horizontally scrolling schedule selector. */
+
+#bmc-bell-schedule .schedule-nav {
+  min-width: 0;
+  padding: .55rem clamp(.65rem, 1.5vw, 1.25rem);
+  border-bottom: 1px solid var(--bmc-v3-gray-300);
+  background: var(--bmc-v3-gray-100);
+}
+
+#bmc-bell-schedule .schedule-nav-scroll {
+  display: flex;
+  gap: .45rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--bmc-v3-gold-dark) var(--bmc-v3-gray-300);
+  scrollbar-width: thin;
+}
+
+/* Buttons grow evenly and retain readable labels. */
+#bmc-bell-schedule .schedule-nav button.bmc-btn {
+  flex: 1 0 108px;
+  min-width: max-content;
+  min-height: 40px;
+  padding-inline: clamp(.7rem, 1.3vw, 1.05rem);
+  border-color: var(--bmc-v3-gray-900);
+  font-size: clamp(.78rem, .9vw, .95rem);
+  white-space: nowrap;
+}
+
+/* Selected schedule. */
+#bmc-bell-schedule .schedule-nav button.bmc-btn.active {
+  border-color: var(--bmc-v3-gold-dark) !important;
+  background: var(--bmc-v3-gold) !important;
+  color: var(--bmc-v3-black) !important;
+}
+
+/* Full-height schedule region. */
+
+#bmc-bell-schedule .schedule-display {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  background: var(--bmc-v3-white);
+}
+
+#bmc-bell-schedule #bmc-schedule-table {
+  width: 100%;
+  min-width: 620px;
+  height: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+
+#bmc-bell-schedule #bmc-schedule-table th,
+#bmc-bell-schedule #bmc-schedule-table td {
+  /* Compact spacing preserves room for projector-sized type. */
+  padding: clamp(.2rem, .6vh, .5rem) clamp(.4rem, .9vw, .8rem);
+  border: 1px solid var(--bmc-v3-gray-300);
+  text-align: left;
+  vertical-align: middle;
+}
+
+#bmc-bell-schedule #bmc-schedule-table th {
+  height: clamp(42px, 6vh, 62px);
+  background: var(--bmc-v3-black);
+  color: var(--bmc-v3-white);
+  font-size: clamp(.9rem, 1.35vw, 1.3rem);
+  font-weight: 800;
+  letter-spacing: .1em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+#bmc-bell-schedule #bmc-schedule-table td {
+  background: var(--bmc-v3-white);
+  color: var(--bmc-v3-black);
+  font-size: clamp(1.2rem, 2.7vw, 2.4rem);
+  line-height: 1.1;
+
+  /* Animate both highlight and reset states. */
+  transition:
+    background-color .45s ease,
+    border-color .45s ease,
+    color .3s ease;
+}
+
+#bmc-bell-schedule #bmc-schedule-table tbody tr:nth-child(odd) td {
+  background: var(--bmc-v3-gray-100);
+}
+
+#bmc-bell-schedule #bmc-schedule-table td:first-child {
+  font-weight: 800;
+}
+
+/* Active period or passing cell. */
+#bmc-bell-schedule #bmc-schedule-table td.highlighted {
+  border-color: var(--bmc-v3-gold-dark);
+  background: var(--bmc-v3-gold) !important;
+  color: var(--bmc-v3-black) !important;
+  font-weight: 800;
+
+  /* Brief bell-ring text motion. */
+  animation: bmc-schedule-bell-ring-jiggle .6s ease-in-out 1;
+}
+
+/* Replay the active end-time cue at reminder thresholds. */
+#bmc-bell-schedule #bmc-schedule-table td.highlighted.bmc-schedule-end-time-reminder {
+  position: relative;
+  animation: bmc-schedule-end-time-reminder 1.4s ease-in-out 1;
+}
+
+#bmc-bell-schedule #bmc-schedule-table td.highlighted.bmc-schedule-end-time-reminder::after {
+  position: absolute;
+  top: 50%;
+  right: .4em;
+  color: var(--bmc-v3-black);
+  content: attr(data-bmc-schedule-end-time-reminder);
+  font-size: 1em;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  line-height: 1;
+  pointer-events: none;
+  text-indent: 0;
+  white-space: nowrap;
+  animation: bmc-schedule-end-time-countdown 1.4s ease-in-out 1;
+}
+
+/* Inline countdown beside the passing duration. */
+#bmc-bell-schedule #bmc-schedule-table .passing-countdown {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .25em;
+  min-width: 0;
+  margin-left: .4em;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+#bmc-bell-schedule #bmc-schedule-table .passing-countdown-value,
+#bmc-bell-schedule #bmc-schedule-table .passing-countdown-label {
+  display: inline;
+}
+
+#bmc-bell-schedule #bmc-schedule-table .passing-countdown-value {
+  font-size: 1em;
+}
+
+#bmc-bell-schedule #bmc-schedule-table .passing-countdown-label {
+  margin-left: 0;
+  font-size: .5em;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  vertical-align: baseline;
+}
+
+/* Urgent countdown below two minutes. */
+#bmc-bell-schedule #bmc-schedule-table .passing-countdown-urgent {
+  color: var(--bmc-v3-danger);
+  font-weight: 500;
+}
+
+@keyframes bmc-schedule-bell-ring-jiggle {
+  0%,
+  100% {
+    text-indent: 0;
+  }
+
+  20% {
+    text-indent: -.16em;
+  }
+
+  40% {
+    text-indent: .13em;
+  }
+
+  60% {
+    text-indent: -.09em;
+  }
+
+  80% {
+    text-indent: .05em;
+  }
+}
+
+@keyframes bmc-schedule-end-time-reminder {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+    text-indent: 0;
+  }
+
+  20% {
+    box-shadow: inset 0 0 0 .12em var(--bmc-v3-gold-dark);
+    text-indent: -.16em;
+  }
+
+  40% {
+    box-shadow: inset 0 0 0 .2em var(--bmc-v3-gold-dark);
+    text-indent: .13em;
+  }
+
+  60% {
+    box-shadow: inset 0 0 0 .12em var(--bmc-v3-gold-dark);
+    text-indent: -.09em;
+  }
+
+  80% {
+    box-shadow: inset 0 0 0 .05em var(--bmc-v3-gold-dark);
+    text-indent: .05em;
+  }
+}
+
+@keyframes bmc-schedule-end-time-countdown {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-42%);
+  }
+
+  20%,
+  80% {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+}
+
+/* End-of-day confetti overlay. */
+#bmc-bell-schedule .end-of-day-confetti {
+  position: absolute;
+  z-index: 200;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#bmc-bell-schedule .confetti-piece {
+  position: absolute;
+  top: -1rem;
+  left: var(--confetti-left);
+  width: clamp(.35rem, .65vw, .6rem);
+  height: clamp(.65rem, 1vw, .95rem);
+  border-radius: .1rem;
+  opacity: 0;
+  animation: bmc-schedule-confetti-fall var(--confetti-duration) ease-in forwards;
+  animation-delay: var(--confetti-delay);
+}
+
+#bmc-bell-schedule .confetti-piece:nth-child(5n + 1) {
+  background: var(--bmc-v3-black);
+}
+
+#bmc-bell-schedule .confetti-piece:nth-child(5n + 2) {
+  background: var(--bmc-v3-gold);
+}
+
+#bmc-bell-schedule .confetti-piece:nth-child(5n + 3) {
+  background: var(--bmc-v3-gray-500);
+}
+
+#bmc-bell-schedule .confetti-piece:nth-child(5n + 4) {
+  border: 1px solid var(--bmc-v3-gray-500);
+  background: var(--bmc-v3-white);
+}
+
+#bmc-bell-schedule .confetti-piece:nth-child(5n + 5) {
+  background: #ffdf00;
+}
+
+@keyframes bmc-schedule-confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -5vh, 0) rotate(0);
+  }
+
+  10%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate3d(var(--confetti-drift), 110vh, 0)
+      rotate(var(--confetti-spin));
+  }
+}
+
+/* Responsive refinements. */
+
+@media (max-width: 760px) {
+
+  #bmc-bell-schedule #bmc-schedule-table td {
+    font-size: 1.15rem;
+  }
+}
+
+/* Reduced-motion preference. */
+
+@media (prefers-reduced-motion: reduce) {
+  #bmc-bell-schedule *,
+  #bmc-bell-schedule *::before,
+  #bmc-bell-schedule *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+
+  /* Keep the highlight without motion. */
+  #bmc-bell-schedule #bmc-schedule-table td.highlighted,
+  #bmc-bell-schedule #bmc-schedule-table td.highlighted.bmc-schedule-end-time-reminder {
+    animation: none !important;
+  }
+
+  #bmc-bell-schedule #bmc-schedule-table td.highlighted.bmc-schedule-end-time-reminder::after {
+    animation: none !important;
+  }
+
+  #bmc-bell-schedule .end-of-day-confetti {
+    display: none;
+  }
+}
+
+
+/* Fit the schedule inside its website content block. */
+#bmc-bell-schedule #bmc-schedule-table { height:auto; }
+#bmc-bell-schedule #bmc-schedule-table td { padding-block:.75rem; }
+
+#bmc-bell-schedule { --bmc-v3-danger:#9c2822; --bmc-v3-gray-500:#888; }
+#bmc-bell-schedule [hidden] { display:none !important; }
+#bmc-bell-schedule .mobile-controls, #bmc-bell-schedule .now-panel { display:none; }
+@media(max-width:760px) {
+  #bmc-bell-schedule .schedule-app { background:#f5f3f1; }
+  #bmc-bell-schedule .utility-header { min-height:64px; padding:14px 16px; justify-content:space-between; border-bottom-width:3px; }
+  #bmc-bell-schedule .utility-clock { text-align:left; }
+  #bmc-bell-schedule .utility-time { font-size:1.6rem; }
+  #bmc-bell-schedule .mobile-date { display:block; font-size:.75rem; color:#d5d2d2; margin-top:4px; }
+  #bmc-bell-schedule .schedule-nav { display:none; }
+  #bmc-bell-schedule .mobile-controls { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; padding:16px 16px 0; align-items:end; }
+  #bmc-bell-schedule .mobile-controls label { min-width:0; font-size:.7rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+  #bmc-bell-schedule select { display:block; width:100%; min-width:0; margin-top:6px; min-height:48px; padding:10px 32px 10px 12px; border:1px solid #b8b3b0; border-radius:0; background:white; color:#242122; font:600 16px inherit; font-family:inherit; font-size:16px; }
+  #bmc-bell-schedule .today-button { min-height:48px; padding:10px; border:1px solid #b8b3b0; background:white; color:#242122; font:700 .85rem Arial,sans-serif; cursor:pointer; }
+  #bmc-bell-schedule select:focus-visible, #bmc-bell-schedule .today-button:focus-visible { outline:3px solid #a9822f; outline-offset:2px; }
+  #bmc-bell-schedule .now-panel { display:block; margin:16px; padding:20px; background:#242122; color:white; border-top:4px solid #ddb75f; }
+  #bmc-bell-schedule .now-eyebrow { color:#ddb75f; font-size:.7rem; letter-spacing:.14em; font-weight:800; text-transform:uppercase; }
+  #bmc-bell-schedule .now-title { font-size:1.6rem; line-height:1.2; margin:8px 0; color:white; }
+  #bmc-bell-schedule .now-detail { font-size:.85rem; color:#ddd9d6; }
+  #bmc-bell-schedule .now-countdown { font-size:2.6rem; font-weight:700; line-height:1.15; margin-top:16px; font-variant-numeric:tabular-nums; }
+  #bmc-bell-schedule .now-countdown small { font-size:.8rem; font-weight:400; margin-left:8px; color:#ddd9d6; }
+  #bmc-bell-schedule .now-progress { display:block; width:100%; height:4px; margin:14px 0; accent-color:#ddb75f; border:0; }
+  #bmc-bell-schedule .now-progress::-webkit-progress-bar { background:#5f5b5c; }
+  #bmc-bell-schedule .now-progress::-webkit-progress-value { background:#ddb75f; }
+  #bmc-bell-schedule .now-next { font-size:.85rem; border-top:1px solid #5f5b5c; padding-top:12px; margin-top:14px; }
+  #bmc-bell-schedule .now-panel.urgent { border-top-color:#ffab96; }
+  #bmc-bell-schedule .now-panel.reminder { outline:3px solid #ddb75f; outline-offset:3px; }
+  #bmc-bell-schedule .schedule-display { overflow:visible; background:transparent; padding:0 16px 16px; }
+  #bmc-bell-schedule #bmc-schedule-table { display:block; min-width:0; width:100%; }
+  #bmc-bell-schedule #bmc-schedule-table caption { display:block; text-align:left; font-size:.75rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:4px 0 12px; }
+  #bmc-bell-schedule #bmc-schedule-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  #bmc-bell-schedule #bmc-schedule-table tbody { display:grid; gap:10px; }
+  #bmc-bell-schedule #bmc-schedule-table tbody tr { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); background:white; border:1px solid #d5d2d2; border-left:3px solid #d5d2d2; padding:14px; gap:8px 12px; }
+  #bmc-bell-schedule #bmc-schedule-table tbody tr.is-current { border-left-color:#a9822f; background:#fff8e8; }
+  #bmc-bell-schedule #bmc-schedule-table tbody tr.is-passing { border-left-color:#a9822f; }
+  #bmc-bell-schedule #bmc-schedule-table td, #bmc-bell-schedule #bmc-schedule-table tbody tr:nth-child(odd) td { padding:0; border:0; background:transparent; font-size:1rem; line-height:1.4; overflow-wrap:anywhere; }
+  #bmc-bell-schedule #bmc-schedule-table td:first-child { grid-column:1 / -1; font-size:1.15rem; }
+  #bmc-bell-schedule #bmc-schedule-table tr.is-current td:first-child::after { content:'NOW'; font-size:.65rem; letter-spacing:.1em; margin-left:10px; background:#ddb75f; padding:3px 6px; vertical-align:middle; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(2)::before { content:'STARTS'; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(3)::before { content:'ENDS'; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(2)::before, #bmc-bell-schedule #bmc-schedule-table td:nth-child(3)::before { display:block; color:#5f5b5c; font-size:.6rem; letter-spacing:.1em; font-weight:700; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(4), #bmc-bell-schedule #bmc-schedule-table td:nth-child(5) { font-size:.75rem; color:#5f5b5c; padding-top:8px; border-top:1px solid #e7e3df; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(4)::before { content:'Duration '; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(5)::before { content:'Passing '; }
+  #bmc-bell-schedule #bmc-schedule-table td.highlighted { background:transparent !important; animation:none; }
+  #bmc-bell-schedule #bmc-schedule-table td:nth-child(5).highlighted { color:#725311 !important; }
+  #bmc-bell-schedule #bmc-schedule-table .passing-countdown { display:block; margin:5px 0 0; }
+}
+@media(min-width:761px) { #bmc-bell-schedule .mobile-date, #bmc-bell-schedule caption { display:none; } }
+
+/* Header and aligned mobile controls, migration revision. */
+#bmc-bell-schedule .utility-header { justify-content:space-between; gap:16px; }
+#bmc-bell-schedule .utility-clock { width:auto; min-width:0; text-align:left; }
+#bmc-bell-schedule .mobile-date { display:block; font-size:clamp(.72rem,1.3vw,1rem); color:#d5d2d2; margin-top:4px; }
+#bmc-bell-schedule .header-remaining { flex-shrink:0; text-align:right; font-variant-numeric:tabular-nums; border-left:1px solid #5f5b5c; padding-left:16px; }
+#bmc-bell-schedule .header-remaining span { display:block; font-size:.7rem; color:#d5d2d2; }
+#bmc-bell-schedule .header-remaining strong { display:block; font-size:clamp(1.5rem,3vw,2.5rem); color:#ddb75f; line-height:1.2; }
+#bmc-bell-schedule .header-remaining.urgent strong { color:#ffab96; }
+#bmc-bell-schedule .data-status { margin:0; padding:10px 16px; background:#fff1cf; color:#5b430e; font-size:.85rem; }
+@media(max-width:760px) {
+ #bmc-bell-schedule .mobile-controls select, #bmc-bell-schedule .today-button { height:48px; min-height:48px; max-height:48px; box-sizing:border-box; margin-bottom:0; line-height:normal; }
+ #bmc-bell-schedule .mobile-controls select { font-family:inherit; font-size:16px; }
+ #bmc-bell-schedule .utility-header { gap:10px; }
+ #bmc-bell-schedule .header-remaining { padding-left:10px; max-width:44%; overflow-wrap:anywhere; }
+ #bmc-bell-schedule .utility-time { font-size:clamp(1.05rem,5vw,1.6rem); }
+}
+</style>
+<div id="bmc-bell-schedule">
+<a class="skip-link" href="#bmc-schedule-output">Skip to schedule</a>
+
+    
+    <div class="schedule-app">
+        
+        <header class="utility-header bmc-section-dark">
+            <div id="bmc-schedule-clock" class="utility-clock" aria-label="Current time"></div><div class="header-remaining"><span class="header-context"></span><strong class="header-count"></strong><span class="header-label"></span></div>
+        </header>
+
+        
+        <nav class="schedule-nav" aria-label="Available bell schedules">
+            <div class="schedule-nav-scroll">
+                <!-- Schedule buttons are generated from JSON by applyConfig(). -->
+            </div>
+        </nav>
+
+        
+        <p class="data-status" role="status" hidden></p><div class="mobile-controls"><label for="mobile-schedule-select">Schedule<select id="mobile-schedule-select"></select></label><button type="button" class="today-button">Today</button></div>
+<section class="now-panel" aria-label="Schedule status"><div class="now-eyebrow"></div><h2 class="now-title"></h2><div class="now-detail"></div><div class="now-countdown"><span></span><small></small></div><progress class="now-progress" max="100" value="0" aria-label="Period progress"></progress><div class="now-next"></div></section>
+<div id="bmc-schedule-output" class="schedule-display"></div>
+    </div>
+</div>
+<script id="bmc-schedule-data" type="application/json">
+{
+  "version": 1,
+  "defaultSchedule": "btn-MF",
+  "weekdays": {
+    "3": "btn-Wed"
+  },
+  "overrides": [
+    {
+      "date": "2026-08-10",
+      "schedule": "btn-bless"
+    },
+    {
+      "date": "2026-08-11",
+      "schedule": "btn-allMass"
+    },
+    {
+      "date": "2026-08-14",
+      "schedule": "btn-pep"
+    },
+    {
+      "date": "2026-08-19",
+      "schedule": "btn-bck2sch",
+      "from": "16:00"
+    },
+    {
+      "date": "2026-09-11",
+      "schedule": "btn-allMass"
+    },
+    {
+      "date": "2026-10-09",
+      "schedule": "btn-pep"
+    },
+    {
+      "date": "2026-10-22",
+      "schedule": "btn-allMass"
+    },
+    {
+      "date": "2026-11-02",
+      "schedule": "btn-allMass"
+    },
+    {
+      "date": "2026-11-30",
+      "schedule": "btn-bless"
+    },
+    {
+      "date": "2026-12-04",
+      "schedule": "btn-pep"
+    },
+    {
+      "date": "2026-12-11",
+      "schedule": "btn-noon"
+    },
+    {
+      "date": "2026-12-08",
+      "schedule": "btn-allMass"
+    }
+  ],
+  "schedules": [
+    {
+      "id": "btn-MF",
+      "label": "M / T / Th / F",
+      "visible": true,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:28 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:36 am",
+          "end": "9:24 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:32 am",
+          "end": "10:20 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "10:28 am",
+          "end": "11:16 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:24 am",
+          "end": "12:12 pm",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:20 pm",
+          "end": "1:08 pm",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:16 pm",
+          "end": "2:04 pm",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "2:12 pm",
+          "end": "3:00 pm",
+          "duration": "0:48",
+          "passing": "0:01"
+        },
+        {
+          "label": "9th",
+          "start": "3:01 pm",
+          "end": "3:30 pm",
+          "duration": "0:30",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-Wed",
+      "label": "Wednesday",
+      "visible": true,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:24 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:32 am",
+          "end": "9:16 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:24 am",
+          "end": "10:08 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "10:16 am",
+          "end": "11:00 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:08 am",
+          "end": "11:52 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:00 pm",
+          "end": "12:44 pm",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "12:52 pm",
+          "end": "1:36 pm",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "1:44 pm",
+          "end": "2:28 pm",
+          "duration": "0:44",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-classMass",
+      "label": "Class Mass",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:28 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:35 am",
+          "end": "9:24 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:32 am",
+          "end": "10:20 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "10:28 am",
+          "end": "11:16 am",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "11:24 am",
+          "end": "12:12 pm",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "12:20 pm",
+          "end": "1:08 pm",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "1:16 pm",
+          "end": "2:04 pm",
+          "duration": "0:48",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "2:12 pm",
+          "end": "3:00 pm",
+          "duration": "0:48",
+          "passing": "0:05"
+        },
+        {
+          "label": "9th",
+          "start": "3:05 pm",
+          "end": "3:38 pm",
+          "duration": "0:38",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-allMass",
+      "label": "All School Mass",
+      "visible": true,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:16 am",
+          "duration": "0:36",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:24 am",
+          "end": "9:00 am",
+          "duration": "0:36",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:08 am",
+          "end": "9:45 am",
+          "duration": "0:37",
+          "passing": "0:15"
+        },
+        {
+          "label": "MASS (3rd)",
+          "start": "10:00 am",
+          "end": "11:15 am",
+          "duration": "1:15",
+          "passing": "0:15"
+        },
+        {
+          "label": "4th",
+          "start": "11:30 am",
+          "end": "12:06 pm",
+          "duration": "0:36",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "12:14 pm",
+          "end": "12:50 pm",
+          "duration": "0:36",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:58 pm",
+          "end": "1:34 pm",
+          "duration": "0:36",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:42 pm",
+          "end": "2:17 pm",
+          "duration": "0:35",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "2:25 pm",
+          "end": "3:00 pm",
+          "duration": "0:35",
+          "passing": "0:01"
+        },
+        {
+          "label": "9th",
+          "start": "3:01 pm",
+          "end": "3:30 pm",
+          "duration": "0:29",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-allMassWed",
+      "label": "Mass (Wednesday)",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:17 am",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:25 am",
+          "end": "9:02 am",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:10 am",
+          "end": "9:45 am",
+          "duration": "0:35",
+          "passing": "0:15"
+        },
+        {
+          "label": "MASS",
+          "start": "10:00 am",
+          "end": "11:15 am",
+          "duration": "1:15",
+          "passing": "0:13"
+        },
+        {
+          "label": "4th",
+          "start": "11:28 am",
+          "end": "11:59 am",
+          "duration": "0:31",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "12:07 pm",
+          "end": "12:38 pm",
+          "duration": "0:31",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:46 pm",
+          "end": "1:17 pm",
+          "duration": "0:31",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:25 pm",
+          "end": "1:55 pm",
+          "duration": "0:30",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "2:03 pm",
+          "end": "2:28 pm",
+          "duration": "0:25",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-bless",
+      "label": "Blessing",
+      "visible": true,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:27 am",
+          "duration": "0:47",
+          "passing": "0:18"
+        },
+        {
+          "label": "Bless (1st)",
+          "start": "8:45 am",
+          "end": "9:15 am",
+          "duration": "0:30",
+          "passing": "0:15"
+        },
+        {
+          "label": "2nd",
+          "start": "09:30 am",
+          "end": "10:11 am",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "10:19 am",
+          "end": "11:00 am",
+          "duration": "0:40",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "11:08 am",
+          "end": "11:48 am",
+          "duration": "0:40",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:56 am",
+          "end": "12:36 pm",
+          "duration": "0:40",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:44 pm",
+          "end": "1:24 pm",
+          "duration": "0:40",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:32 pm",
+          "end": "2:12 pm",
+          "duration": "0:40",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "2:20 pm",
+          "end": "3:00 pm",
+          "duration": "0:40",
+          "passing": "0:01"
+        },
+        {
+          "label": "9th",
+          "start": "3:01 pm",
+          "end": "3:30 pm",
+          "duration": "0:29",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-blessWed",
+      "label": "Blessing (Wednesday)",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:15 am",
+          "duration": "0:35",
+          "passing": "0:15"
+        },
+        {
+          "label": "Bless",
+          "start": "8:30 am",
+          "end": "9:00 am",
+          "duration": "0:30",
+          "passing": "0:15"
+        },
+        {
+          "label": "2nd",
+          "start": "9:15 am",
+          "end": "9:52 am",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "10:00 am",
+          "end": "10:37 am",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "10:45 am",
+          "end": "11:22 am",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:30 am",
+          "end": "12:07 pm",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:15 pm",
+          "end": "12:52 pm",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:00 pm",
+          "end": "1:37 pm",
+          "duration": "0:37",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "1:45 pm",
+          "end": "2:22 pm",
+          "duration": "0:37",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-noon",
+      "label": "Noon Dismissal",
+      "visible": true,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:05 am",
+          "duration": "0:25",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:13 am",
+          "end": "8:38 am",
+          "duration": "0:25",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "8:46 am",
+          "end": "9:11 am",
+          "duration": "0:25",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "9:19 am",
+          "end": "9:45 am",
+          "duration": "0:26",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "9:53 am",
+          "end": "10:19 am",
+          "duration": "0:26",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "10:27 am",
+          "end": "10:53 am",
+          "duration": "0:26",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "11:01 am",
+          "end": "11:26 am",
+          "duration": "0:25",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "11:34 am",
+          "end": "12:00 pm",
+          "duration": "0:26",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-assembly",
+      "label": "Assembly",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:23 am",
+          "duration": "0:43",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:31 am",
+          "end": "9:14 am",
+          "duration": "0:43",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:22 am",
+          "end": "10:05 am",
+          "duration": "0:43",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "10:13 am",
+          "end": "10:57 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:05 am",
+          "end": "11:49 am",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "11:57 am",
+          "end": "12:41 pm",
+          "duration": "0:44",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "12:49 pm",
+          "end": "1:32 pm",
+          "duration": "0:43",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "1:40 pm",
+          "end": "2:23 pm",
+          "duration": "0:43",
+          "passing": "0:12"
+        },
+        {
+          "label": "Assembly",
+          "start": "2:35 pm",
+          "end": "3:00 pm",
+          "duration": "0:25",
+          "passing": "0:01"
+        },
+        {
+          "label": "9th",
+          "start": "3:01 pm",
+          "end": "3:30 pm",
+          "duration": "0:30",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-pep",
+      "label": "Pep Rally",
+      "visible": true,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:21 am",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:29 am",
+          "end": "9:10 am",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "3rd",
+          "start": "9:18 am",
+          "end": "9:59 am",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "10:07 am",
+          "end": "10:48 am",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "10:56 am",
+          "end": "11:37 am",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:45 am",
+          "end": "12:26 pm",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:34 pm",
+          "end": "1:15 pm",
+          "duration": "0:41",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "1:23 pm",
+          "end": "2:04 pm",
+          "duration": "0:41",
+          "passing": "0:14"
+        },
+        {
+          "label": "Pep",
+          "start": "2:18 pm",
+          "end": "3:00 pm",
+          "duration": "0:42",
+          "passing": "0:01"
+        },
+        {
+          "label": "9th",
+          "start": "3:01 pm",
+          "end": "3:30 pm",
+          "duration": "0:30",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-speaker",
+      "label": "Speaker",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:10 am",
+          "duration": "0:30",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:18 am",
+          "end": "8:48 am",
+          "duration": "0:30",
+          "passing": "0:17"
+        },
+        {
+          "label": "Speaker",
+          "start": "9:05 am",
+          "end": "10:05 am",
+          "duration": "1:00",
+          "passing": "0:15"
+        },
+        {
+          "label": "3rd",
+          "start": "10:20 am",
+          "end": "10:59 am",
+          "duration": "0:39",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "11:07 am",
+          "end": "11:46 am",
+          "duration": "0:39",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:54 am",
+          "end": "12:33 pm",
+          "duration": "0:39",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:41 pm",
+          "end": "1:20 pm",
+          "duration": "0:39",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:28 pm",
+          "end": "2:06 pm",
+          "duration": "0:38",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "2:14 pm",
+          "end": "2:52 pm",
+          "duration": "0:38",
+          "passing": ""
+        },
+        {
+          "label": "9th",
+          "start": "2:52 pm",
+          "end": "3:30 pm",
+          "duration": "0:38",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-speakerWed",
+      "label": "Speaker (Wednesday)",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "7:40 am",
+          "end": "8:10 am",
+          "duration": "0:30",
+          "passing": "0:08"
+        },
+        {
+          "label": "2nd",
+          "start": "8:18 am",
+          "end": "8:48 am",
+          "duration": "0:30",
+          "passing": "0:17"
+        },
+        {
+          "label": "Speaker",
+          "start": "9:05 am",
+          "end": "10:05 am",
+          "duration": "1:00",
+          "passing": "0:15"
+        },
+        {
+          "label": "3rd",
+          "start": "10:20 am",
+          "end": "10:54 am",
+          "duration": "0:34",
+          "passing": "0:08"
+        },
+        {
+          "label": "4th",
+          "start": "11:02 am",
+          "end": "11:36 am",
+          "duration": "0:34",
+          "passing": "0:08"
+        },
+        {
+          "label": "5th",
+          "start": "11:44 am",
+          "end": "12:18 pm",
+          "duration": "0:34",
+          "passing": "0:08"
+        },
+        {
+          "label": "6th",
+          "start": "12:26 pm",
+          "end": "1:00 pm",
+          "duration": "0:34",
+          "passing": "0:08"
+        },
+        {
+          "label": "7th",
+          "start": "1:08 pm",
+          "end": "1:41 pm",
+          "duration": "0:33",
+          "passing": "0:08"
+        },
+        {
+          "label": "8th",
+          "start": "1:45 pm",
+          "end": "2:22 pm",
+          "duration": "0:33",
+          "passing": ""
+        }
+      ]
+    },
+    {
+      "id": "btn-Exams",
+      "label": "Exams",
+      "visible": false,
+      "periods": [
+        {
+          "label": "Arrive",
+          "start": "7:30 am",
+          "end": "7:55 am",
+          "duration": "0:15",
+          "passing": "0:05"
+        },
+        {
+          "label": "Exam 1",
+          "start": "8:00 am",
+          "end": "9:30 am",
+          "duration": "1:30",
+          "passing": "0:30"
+        },
+        {
+          "label": "Exam 2",
+          "start": "10:00 am",
+          "end": "11:30 am",
+          "duration": "1:30",
+          "passing": "0:01"
+        },
+        {
+          "label": "Dismiss",
+          "start": "11:31 am",
+          "end": "3:30 pm",
+          "duration": "4:00",
+          "passing": "0:00"
+        }
+      ]
+    },
+    {
+      "id": "btn-bck2sch",
+      "label": "Back to School Night",
+      "visible": false,
+      "periods": [
+        {
+          "label": "1st",
+          "start": "6:00 pm",
+          "end": "6:08 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "2nd",
+          "start": "6:18 pm",
+          "end": "6:26 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "3rd",
+          "start": "6:36 pm",
+          "end": "6:44 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "4th",
+          "start": "6:54 pm",
+          "end": "7:02 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "5th",
+          "start": "7:12 pm",
+          "end": "7:20 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "6th",
+          "start": "7:30 pm",
+          "end": "7:38 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "7th",
+          "start": "7:48 pm",
+          "end": "7:56 pm",
+          "duration": "0:08",
+          "passing": "0:10"
+        },
+        {
+          "label": "8th",
+          "start": "8:06 pm",
+          "end": "8:14 pm",
+          "duration": "0:08",
+          "passing": ""
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script>
+(function () {
+"use strict";
+const root = document.getElementById("bmc-bell-schedule");
+if (!root || root.dataset.initialized) return;
+root.dataset.initialized = "true";
+
+
+// ===========================================================
+// Data for Bell Schedules 
+// ===========================================================
+
+// Optional HTTPS JSON endpoint. It must allow cross-origin reads from the embed.
+// Leave blank to use the application/json block above. Do not use a Google Sites page URL.
+const DATA_URL = "";
+let config = JSON.parse(document.getElementById('bmc-schedule-data').textContent);
+let data = {};
+function escapeText(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function validateConfig(value) {
+ if(value.version!==1 || !Array.isArray(value.schedules) || !value.schedules.length) throw Error('Invalid schedule document');
+ const ids=new Set();
+ const time=s=>typeof s==='string' && /^(0?[1-9]|1[0-2]):[0-5][0-9] (am|pm)$/.test(s);
+ for(const schedule of value.schedules) {
+  if(!/^btn-[A-Za-z0-9_-]+$/.test(schedule.id)||ids.has(schedule.id)||typeof schedule.label!=='string'||!schedule.label.trim()||!Array.isArray(schedule.periods)||!schedule.periods.length) throw Error('Invalid or duplicate schedule');
+  ids.add(schedule.id);
+  let last=-1;
+  for(const row of schedule.periods) {
+   if(typeof row.label!=='string'||!time(row.start)||!time(row.end)||typeof row.duration!=='string'||typeof row.passing!=='string') throw Error('Invalid period');
+   const start=getDate(row.start).getTime(),end=getDate(row.end).getTime();
+   if(end<=start || start<last) throw Error('Overlapping or reversed periods');
+   last=end;
+  }
+ }
+ if(!ids.has(value.defaultSchedule)||!value.weekdays||!Array.isArray(value.overrides)) throw Error('Missing default rules');
+ for(const id of Object.values(value.weekdays)) if(!ids.has(id)) throw Error('Unknown weekday schedule');
+ for(const rule of value.overrides) {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(rule.date)||!ids.has(rule.schedule)||(rule.from && !/^([01]\d|2[0-3]):[0-5]\d$/.test(rule.from))) throw Error('Invalid date override');
+ }
+}
+function scheduleForDate(value,now) {
+ const date=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+ const minute=now.getHours()*60+now.getMinutes();
+ const matches=value.overrides.filter(rule=>rule.date===date && (!rule.from || minute>=Number(rule.from.slice(0,2))*60+Number(rule.from.slice(3))));
+ matches.sort((a,b)=>(a.from||'00:00').localeCompare(b.from||'00:00'));
+ return matches.length?matches[matches.length-1].schedule:(value.weekdays[String(now.getDay())]||value.defaultSchedule);
+}
+function applyConfig(value) {
+ validateConfig(value);
+ const followingToday=!currentSchedule || currentSchedule===todaySchedule;
+ config=value;
+ data=Object.fromEntries(config.schedules.map(s=>[s.id,[['Period','Start','End','Duration','Passing'],...s.periods.map(p=>[p.label,p.start,p.end,p.duration,p.passing])]]));
+ todaySchedule=scheduleForDate(config,new Date());
+ const nav=root.querySelector('.schedule-nav-scroll'); nav.replaceChildren(); picker.replaceChildren();
+ for(const schedule of config.schedules.filter(s=>s.visible || s.id===todaySchedule || s.id===currentSchedule)) {
+  const button=document.createElement('button');button.type='button';button.id=schedule.id;button.className='bmc-btn bmc-btn-sm bmc-btn-outline';button.textContent=schedule.label;button.addEventListener('click',()=>navClick(schedule.id));nav.appendChild(button);
+  const option=document.createElement('option');option.value=schedule.id;option.textContent=schedule.label;picker.appendChild(option);
+ }
+ navClick(followingToday || !data[currentSchedule]?todaySchedule:currentSchedule);
+}
+let screenTimer = null;
+let currentSchedule = '';
+let todaySchedule = '';
+const picker = root.querySelector('#mobile-schedule-select');
+
+picker.addEventListener('change', () => navClick(picker.value));
+root.querySelector('.today-button').addEventListener('click', () => navClick(todaySchedule));
+
+
+// Respond to topnav menu button clicked 
+function navClick(btnClicked) {
+    currentSchedule = btnClicked;
+    
+    if (!Array.from(picker.options).some(option => option.value === btnClicked)) {
+      const option=document.createElement('option'); option.value=btnClicked; option.textContent=config.schedules.find(s=>s.id===btnClicked).label; picker.appendChild(option);
+    }
+    picker.value=btnClicked;
+
+    // Change active button to button clicked
+    root.querySelectorAll(".schedule-nav button.active").forEach(function (button) {
+        button.classList.remove("active");
+    });
+    const selectedButton = root.querySelector("#" + btnClicked);
+    if (selectedButton) selectedButton.classList.add("active");
+    root.querySelectorAll('.schedule-nav button').forEach(button => button.setAttribute('aria-pressed', String(button.id === btnClicked)));
+    
+    buildTable(data[btnClicked]);
+    updateScreen();
+    updateMobileStatus();
+
+    // Keep one screen timer regardless of menu changes.
+    if (screenTimer === null)
+        screenTimer = setInterval(updateScreen, 1000);
+}
+
+// Generic build table from data array
+function buildTable(tableArr) {
+    // Remove existing schedule
+    const schedule = root.querySelector("#" + "bmc-schedule-output");
+    schedule.innerHTML = "";
+    const [headings, ...rows] = tableArr;
+    let tableString = '<table id="bmc-schedule-table" role="table"><caption>Full schedule</caption><thead><tr>';
+    for (let header of headings) {
+        tableString += '<th scope="col">' + header + "</th>";
+    }
+    tableString += "</tr></thead><tbody>"
+
+    for (let aRow of rows) {
+        tableString += "<tr>";
+        for (let cell of aRow) {
+            tableString += "<td>" + escapeText(cell) + "</td>";
+        }
+        tableString += "</tr>";
+    }
+    tableString += "</tbody></table>";
+    schedule.innerHTML = tableString;
+}
+
+// Helper function for updateScreen()
+function getDate(timeStr) {
+    timeStr = timeStr.trim();
+    let now = new Date();
+    let hr = parseInt(timeStr.split(":")[0]);
+    let mi = parseInt((timeStr.split(":")[1]).split(" ")[0]);
+    let meridiem = timeStr.split(" ")[1];
+    if (meridiem == "pm" && hr < 12) {
+        hr = hr + 12;
+    } 
+    if (meridiem == "am" && hr === 12) hr = 0;
+    now.setHours(hr, mi, 0, 0);
+    return now;
+}
+
+// Updates Screen every second for clock and highlighting the period
+function updateScreen() {
+    // Get current time - need seconds
+    let now = new Date();
+
+    // Update Clock
+    const timeDiv = root.querySelector("#" + "bmc-schedule-clock");
+    const currentTime = now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    timeDiv.innerHTML = "<span class='utility-time'>" + currentTime + "</span><span class='mobile-date'>" + now.toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'}) + "</span>";
+
+        
+    // Get table to highlight current period
+    let table = root.querySelector("#" + "bmc-schedule-table");
+
+    // Use a static list so removing classes cannot skip cells.
+    root.querySelectorAll("#bmc-schedule-table .highlighted").forEach(function (cell) {
+        cell.classList.remove("highlighted");
+    });
+
+    // Highlight Current Period
+    for (var r = 1, n = table.rows.length; r < n; r++) {
+        let startStr = table.rows[r].cells[1].innerHTML;
+        let startTime = getDate(startStr)
+        let endStr = table.rows[r].cells[2].innerHTML;
+        let endTime = getDate(endStr);
+        // console.log(startTime, now, endTime);
+        if (startTime <= now && now < endTime) {
+            // console.log("Row:", r);
+            table.rows[r].cells[0].classList.add('highlighted');
+            table.rows[r].cells[1].classList.add('highlighted');
+            table.rows[r].cells[2].classList.add('highlighted');
+            table.rows[r].cells[3].classList.add('highlighted');
+            table.rows[r].cells[4].classList.remove('highlighted');
+        }
+    }
+    // Highlight if in passing between periods
+    for (var r = 1, n = table.rows.length; r < n-1; r++) {
+        let startStr = table.rows[r].cells[2].innerHTML;
+        let startTime = getDate(startStr)
+        let endStr = table.rows[r+1].cells[1].innerHTML;
+        let endTime = getDate(endStr);
+        // console.log(startTime, now, endTime);
+        if (startTime <= now && now < endTime) {
+            // console.log("Row:", r);
+            table.rows[r].cells[0].classList.remove('highlighted');
+            table.rows[r].cells[1].classList.remove('highlighted');
+            table.rows[r].cells[2].classList.remove('highlighted');
+            table.rows[r].cells[3].classList.remove('highlighted');
+            table.rows[r].cells[4].classList.add('highlighted');
+        }
+    }
+}
+
+function updateMobileStatus() {
+ const rows=Array.from(root.querySelectorAll('#bmc-schedule-table tbody tr'));
+ const now=new Date(); const seconds=(end)=>Math.max(0,Math.ceil((end-now)/1000));
+ const panel=root.querySelector('.now-panel');
+ const put=(selector,value)=>{const el=panel.querySelector(selector); if(el.textContent!==value) el.textContent=value;};
+ let active=-1, upcoming=-1;
+ rows.forEach((row,index)=>{
+   const start=getDate(row.cells[1].textContent), end=getDate(row.cells[2].textContent);
+   const live=start<=now && now<end;
+   row.classList.toggle('is-current',live);
+   row.classList.toggle('is-passing',!!row.cells[4].querySelector('.passing-countdown'));
+   if(live) active=index;
+   if(upcoming<0 && start>now) upcoming=index;
+ });
+ const preview=currentSchedule!==todaySchedule;
+ const row=rows[active>=0?active:upcoming];
+ const passing=active<0 && upcoming>0;
+ put('.now-eyebrow',preview?'Schedule preview':active>=0?'Happening now':passing?'Passing time':upcoming>=0?'Before school':'Schedule complete');
+ put('.now-title',active>=0?row.cells[0].textContent+' period':passing?'Time to head to class':upcoming>=0?'Your day starts soon':'That’s the full schedule');
+ if(active>=0 && !/^\d/.test(row.cells[0].textContent)) put('.now-title',row.cells[0].textContent);
+ put('.now-detail',row ? (active>=0?row.cells[1].textContent.trim()+' – '+row.cells[2].textContent.trim():row.cells[0].textContent+' starts at '+row.cells[1].textContent.trim()) : 'Last period ended at '+rows[rows.length-1].cells[2].textContent.trim());
+ const target=row?getDate(row.cells[active>=0?2:1].textContent):null;
+ const left=target?seconds(target):0;
+ panel.querySelector('.now-countdown').hidden=!row;
+ put('.now-countdown span',Math.floor(left/60)+':'+String(left%60).padStart(2,'0'));
+ put('.now-countdown small',active>=0?'remaining':'until class');
+ const progress=panel.querySelector('progress'); progress.hidden=active<0;
+ if(active>=0){const start=getDate(row.cells[1].textContent); progress.value=Math.min(100,Math.max(0,(now-start)/(target-start)*100));}
+ const next=rows[active>=0?active+1:upcoming];
+ put('.now-next',next?'Up next · '+next.cells[0].textContent+' · '+next.cells[1].textContent.trim():'No more periods in this schedule');
+ panel.classList.toggle('urgent',passing && left<120);
+ const top=root.querySelector('.header-remaining');
+ top.querySelector('.header-context').textContent=(preview?'Preview · ':'')+(active>=0?row.cells[0].textContent:passing?'Passing':row?'Before school':'Finished');
+ top.querySelector('.header-count').textContent=row?Math.floor(left/60)+':'+String(left%60).padStart(2,'0'):'—';
+ top.querySelector('.header-label').textContent=row?(active>=0?'remaining':'until class'):'for this schedule';
+ top.classList.toggle('urgent',passing && left<120);
+}
+
+applyConfig(config);
+// Re-evaluate date and time rules even when a display stays open overnight.
+setInterval(function(){ if(scheduleForDate(config,new Date())!==todaySchedule) applyConfig(config); },1000);
+let loadingData=false;
+async function refreshData(){
+ if(!DATA_URL || loadingData) return;
+ loadingData=true;
+ const controller=new AbortController(); const timeout=setTimeout(()=>controller.abort(),12000);
+ try {
+  const url=new URL(DATA_URL);if(url.protocol!=='https:') throw Error('Use HTTPS');
+  const response=await fetch(url,{cache:'no-store',credentials:'omit',signal:controller.signal});
+  if(!response.ok) throw Error('Schedule service unavailable');
+  applyConfig(await response.json());
+  root.querySelector('.data-status').hidden=true;
+ } catch(error) {
+  const status=root.querySelector('.data-status');status.textContent='Schedule updates unavailable. Showing the last loaded schedule.';status.hidden=false;
+ } finally {clearTimeout(timeout);loadingData=false;}
+}
+refreshData();setInterval(refreshData,300000);
+/* Add a live countdown to the highlighted passing cell. */
+function updatePassingCountdown() {
+    const table = root.querySelector("#" + "bmc-schedule-table");
+    const existingCountdowns = root.querySelectorAll(".passing-countdown");
+
+    // Clear countdowns when no passing column is available.
+    if (!table) {
+        existingCountdowns.forEach(function (countdown) {
+            countdown.remove();
+        });
+        return;
+    }
+
+    // The fifth cell is highlighted only during passing time.
+    const passingCell = table.querySelector("tbody td:nth-child(5).highlighted");
+    if (!passingCell) {
+        existingCountdowns.forEach(function (countdown) {
+            countdown.remove();
+        });
+        return;
+    }
+
+    const currentRow = passingCell.parentElement;
+    const nextRow = currentRow.nextElementSibling;
+    if (!nextRow) {
+        return;
+    }
+
+    const nextStart = getDate(nextRow.cells[1].textContent);
+    const remainingSeconds = Math.max(
+        0,
+        Math.ceil((nextStart.getTime() - new Date().getTime()) / 1000)
+    );
+
+    // Remove zero at the next period boundary.
+    if (remainingSeconds === 0) {
+        existingCountdowns.forEach(function (countdown) {
+            countdown.remove();
+        });
+        return;
+    }
+
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = String(remainingSeconds % 60).padStart(2, "0");
+    let countdown = passingCell.querySelector(".passing-countdown");
+
+    // Append the countdown without replacing the passing duration.
+    if (!countdown) {
+        countdown = document.createElement("span");
+        countdown.className = "passing-countdown";
+
+        const countdownValue = document.createElement("span");
+        countdownValue.className = "passing-countdown-value";
+        countdown.appendChild(countdownValue);
+
+        const countdownLabel = document.createElement("span");
+        countdownLabel.className = "passing-countdown-label";
+        countdownLabel.textContent = "left";
+        countdown.appendChild(countdownLabel);
+
+        passingCell.appendChild(countdown);
+    }
+
+    // Update the numeric value and keep the LEFT label stable.
+    countdown.querySelector(".passing-countdown-value").textContent =
+        minutes + ":" + seconds;
+    countdown.title = minutes + " minutes and " + seconds
+        + " seconds until " + nextRow.cells[0].textContent.trim();
+
+    // Apply the urgent style below two minutes.
+    countdown.classList.toggle(
+        "passing-countdown-urgent",
+        remainingSeconds < 120
+    );
+
+    // Remove countdowns left in previous rows.
+    existingCountdowns.forEach(function (existingCountdown) {
+        if (existingCountdown !== countdown) {
+            existingCountdown.remove();
+        }
+    });
+}
+
+// Refresh after the screen timer updates the highlight.
+updatePassingCountdown();
+updateMobileStatus();
+setInterval(function(){updatePassingCountdown(); updateMobileStatus();}, 1000);
+
+/* Replay the end-time cue when a period reaches 10 or 5 minutes left. */
+let lastEndTimeReminderTick = null;
+
+function updateEndTimeReminder() {
+    const now = new Date();
+    const previousTick = lastEndTimeReminderTick;
+    lastEndTimeReminderTick = now.getTime();
+
+    // Ignore the first check and backward debug jumps.
+    if (previousTick === null || now.getTime() < previousTick) {
+        return;
+    }
+
+    const endTimeCell = root.querySelector(
+        "#bmc-schedule-table tbody td:nth-child(3).highlighted"
+    );
+    if (!endTimeCell) {
+        return;
+    }
+
+    const row = endTimeCell.parentElement;
+    const startTime = getDate(row.cells[1].textContent).getTime();
+    const endTime = getDate(endTimeCell.textContent).getTime();
+    const thresholds = [10 * 60 * 1000, 5 * 60 * 1000];
+    const crossedReminders = thresholds.filter(function (threshold) {
+        const reminderTime = endTime - threshold;
+        return endTime - startTime >= threshold
+            && previousTick < reminderTime
+            && now.getTime() >= reminderTime;
+    });
+
+    if (crossedReminders.length === 0) {
+        return;
+    }
+
+    root.querySelector(".now-panel").classList.add("reminder");
+    window.setTimeout(() => root.querySelector(".now-panel").classList.remove("reminder"), 1400);
+    const reminderMinutes =
+        crossedReminders[crossedReminders.length - 1] / (60 * 1000);
+    endTimeCell.classList.remove("bmc-schedule-end-time-reminder");
+    void endTimeCell.offsetWidth;
+    endTimeCell.setAttribute(
+        "data-bmc-schedule-end-time-reminder",
+        "T-" + reminderMinutes
+    );
+    endTimeCell.classList.add("bmc-schedule-end-time-reminder");
+
+    window.setTimeout(function () {
+        endTimeCell.classList.remove("bmc-schedule-end-time-reminder");
+        endTimeCell.removeAttribute("data-bmc-schedule-end-time-reminder");
+    }, 1400);
+}
+
+updateEndTimeReminder();
+setInterval(updateEndTimeReminder, 1000);
+
+/* Celebrate when the clock crosses the end of 8th period. */
+let lastEndOfDayTick = null;
+
+function launchEndOfDayConfetti() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+    }
+
+    const existingConfetti = root.querySelector(".end-of-day-confetti");
+    if (existingConfetti) {
+        existingConfetti.remove();
+    }
+
+    const confetti = document.createElement("div");
+    confetti.className = "end-of-day-confetti";
+    confetti.setAttribute("aria-hidden", "true");
+
+    for (let index = 0; index < 48; index++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.setProperty("--confetti-left", Math.random() * 100 + "%");
+        piece.style.setProperty(
+            "--confetti-drift",
+            (Math.random() * 12 - 6) + "vw"
+        );
+        piece.style.setProperty(
+            "--confetti-spin",
+            (Math.random() * 720 + 360) + "deg"
+        );
+        piece.style.setProperty(
+            "--confetti-duration",
+            (Math.random() * 1.2 + 2.8) + "s"
+        );
+        piece.style.setProperty(
+            "--confetti-delay",
+            (Math.random() * .45) + "s"
+        );
+        confetti.appendChild(piece);
+    }
+
+    root.appendChild(confetti);
+    window.setTimeout(function () {
+        confetti.remove();
+    }, 4500);
+}
+
+function updateEndOfDayCelebration() {
+    const now = new Date().getTime();
+    const previousTick = lastEndOfDayTick;
+    lastEndOfDayTick = now;
+
+    // Ignore the first check and backward debug jumps.
+    if (previousTick === null || now < previousTick) {
+        return;
+    }
+
+    const rows = root.querySelectorAll("#bmc-schedule-table tbody tr");
+    let eighthPeriodRow = null;
+    rows.forEach(function (row) {
+        if (row.cells[0].textContent.trim().toLowerCase() === "8th") {
+            eighthPeriodRow = row;
+        }
+    });
+
+    if (!eighthPeriodRow) {
+        return;
+    }
+
+    const endTime = getDate(eighthPeriodRow.cells[2].textContent).getTime();
+    if (previousTick < endTime && now >= endTime) {
+        launchEndOfDayConfetti();
+    }
+}
+
+updateEndOfDayCelebration();
+setInterval(updateEndOfDayCelebration, 1000);
+
+
+
+})();
+</script>
+</body></html>
