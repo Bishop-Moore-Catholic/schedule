@@ -462,6 +462,15 @@
  #bmc-bell-schedule .header-remaining { padding-left:10px; max-width:44%; overflow-wrap:anywhere; }
  #bmc-bell-schedule .utility-time { font-size:clamp(1.05rem,5vw,1.6rem); }
 }
+/* Keep the mobile clock and countdown visible while scrolling the embed. */
+@media (max-width:760px) {
+ #bmc-bell-schedule .utility-header {
+  position:sticky;
+  top:0;
+  z-index:100;
+  box-shadow:0 3px 10px rgba(36,33,34,.16);
+ }
+}
 </style>
 <div id="bmc-bell-schedule">
 <a class="skip-link" href="#bmc-schedule-output">Skip to schedule</a>
